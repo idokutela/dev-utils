@@ -1,0 +1,11 @@
+{
+  "name": "dev_utils",
+  "version": "0.0.0",
+  "description": "A simple set of dev utils",
+  "main": "index.js",
+  "author": "Alexander Kahle",
+  "license": "MIT",
+  "devDependencies": {
+    "shadow-cljs": "^2.7.26"
+  }
+}
