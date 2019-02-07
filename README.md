@@ -13,6 +13,17 @@ expressed in environment variables. Currently, two environment variables are of 
    only emitted as code when their level is greated than or equal to
    the `LOG_LEVEL`.
 
+## Using the library
+
+Just add this line to `:deps` in your `deps.edn`:
+
+```cljs
+github-idokutela/to-go {:git/url "https://github.com/idokutela/dev_utils"
+                        :sha     "17dc775ca66a242b87ec0ffc0061f03bebe24f3d"}
+```
+
+then follow the example.
+
 ## API
 
 Currently, there are two public macros:
@@ -41,3 +52,7 @@ Currently, there are two public macros:
 (utils/log :warn "This will print unless LOG-LEVEL=error or LOG-LEVEL=silent")
 (utils/log :error "This will print unless LOG-LEVEL=silent.")
 ```
+
+
+## License
+MIT
