@@ -1,63 +1,59 @@
 (ns dev-utils.core
-  #? (:cljs (:require-macros [dev-utils.core :refer [debug log]]))
+  #? (:cljs (:require-macros [dev-utils.core :refer [dev log]]))
   #? (:clj (:require [clojure.string :refer [lower-case]]
                      [clojure.pprint :refer [pprint]])
       :cljs (:require [cljs.pprint :refer [pprint]])))
 
+;;; Code emission
+(def DEBUG "DEBUG")
+
+
 #?(:clj (defn get-environment-variable
+          "Gets the environment variable `name`, optionally returning `default`
+  if not set."
           [name & {:keys [default]}]
           (or (System/getenv name) default)))
-
-(def DEBUG "DEBUG")
 
 #?(:clj (defn is-debug?
           []
           (some? (get-environment-variable DEBUG))))
 
-(defmacro debug
-  "Inserts the expressions in a `do` block when the debug environment variable is set, otherwise removes them.
 
-  The result is always `nil`."
+
+(defmacro dev
+  "Emits the expressions followed by `nil` in a `do` block when the DEBUG environment variable is set, otherwise removes them."
   [& exprs]
-  (when (is-debug?)
-    '(do ~@exprs nil)))
+  (when (is-debug?) `(do ~@exprs nil)))
 
+
+
+;;; Logging
 
 (def LOG-LEVEL "LOG_LEVEL")
+(def ^:private log-level-value
+  {:debug  1
+   :log    2
+   :warn   3
+   :error  4
+   :silent 5})
 
-(defn- order-level
-  [level]
-  (case level
-    :debug  1
-    :log    2
-    :warn   3
-    :error  4
-    :silent 5
-    10000))
-
-#?(:clj (defn get-log-level
+#?(:clj (defn- log-level
           []
           (let [level (get-environment-variable LOG-LEVEL :default "LOG")]
             (keyword (lower-case level)))))
-
 #?(:clj
    (defn- should-log?
      [level]
-     (let [set-level (get-log-level)]
-       (<= (order-level set-level) (order-level level)))))
+     (<= (log-level-value (log-level)) (log-level-value level))))
+
 
 
 (defprotocol ILogger
-  "A logger implements this protocol.
-
-  By default, it uses console in js, and println in java."
+  "A logger implements this protocol."
   (-warn  [logger message])
   (-log   [logger message])
   (-error [logger message])
   (-debug [logger message]))
-
-
-;;; Soon, the logger will be configurable.
 
 (defn- pprint-items
   [items]

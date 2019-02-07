@@ -17,10 +17,27 @@ expressed in environment variables. Currently, two environment variables are of 
 
 Currently, there are two public macros:
 
- - `debug`: places a code block in a `do` block if the `DEBUG`
-   variable is set, otherwise replaces with `nil`. The `do` block
-   _always_ evaluates to `nil`.
+ - `dev & <exprs>`: places the expressions followed by `nil`in a `do`
+   block if the `DEBUG` variable is set, otherwise replaces with
+   `nil`.
 
  - `log <level> & <message>`: Logs a message. Evaluates to nil.  The
    code is only emitted if the `LOG_LEVEL` is less than or equal to
    the given level.
+
+## Example
+
+```clojure
+(ns bla
+  (:require [dev-utils :as utils]))
+
+;;; This will only print if the DEBUG environment is set.
+(utils/dev
+  (println "I'm in dev mode"))
+
+;;; LOG-LEVEL defaults to "debug"
+(utils/log :debug "This will only print when LOG-LEVEL = debug")
+(utils/log :log "This will print when LOG-LEVEL=debug or LOG-LEVEL=log")
+(utils/log :warn "This will print unless LOG-LEVEL=error or LOG-LEVEL=silent")
+(utils/log :error "This will print unless LOG-LEVEL=silent.")
+```
