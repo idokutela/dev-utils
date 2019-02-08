@@ -82,10 +82,10 @@ then follow the example.
 ;;; It defaults to "DEBUG".
 
 ;;; The log function logs depending on LOG_LEVEL.
-(utils/log :debug "This will only print when LOG-LEVEL = debug")
-(utils/log :log "This will print when LOG-LEVEL=debug or LOG-LEVEL=log")
-(utils/log :warn "This will print unless LOG-LEVEL=error or LOG-LEVEL=silent")
-(utils/log :error "This will print unless LOG-LEVEL=silent.")
+(utils/log :debug "This will only print when LOG_LEVEL=debug")
+(utils/log :log "This will print when LOG_LEVEL=debug or LOG-LEVEL=log")
+(utils/log :warn "This will print unless LOG_LEVEL=error or LOG-LEVEL=silent")
+(utils/log :error "This will print unless LOG_LEVEL=silent.")
 
 
 ;;; Miscellaneous
