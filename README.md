@@ -82,6 +82,8 @@ then follow the example.
 ;;; It defaults to "DEBUG".
 
 ;;; The log function logs depending on LOG_LEVEL.
+;;; If it doesn't log, simply evaluates to `nil`, incurring no
+;;; runtime cost.
 (utils/log :debug "This will only print when LOG_LEVEL=debug")
 (utils/log :log "This will print when LOG_LEVEL=debug or LOG-LEVEL=log")
 (utils/log :warn "This will print unless LOG_LEVEL=error or LOG-LEVEL=silent")
