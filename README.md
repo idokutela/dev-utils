@@ -19,8 +19,9 @@ variables are of interest:
 Just add this line to `:deps` in your `deps.edn`:
 
 ```cljs
-github-idokutela/to-go {:git/url "https://github.com/idokutela/dev-utils"
-                        :sha     "2681f431254f36df3a690f246bbe5148ad59babb"}
+github-idokutela/dev-utils
+ {:git/url "https://github.com/idokutela/dev-utils"
+  :sha     "2681f431254f36df3a690f246bbe5148ad59babb"}
 ```
 
 then follow the example.
