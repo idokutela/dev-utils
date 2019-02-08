@@ -5,8 +5,6 @@
       :cljs (:require [cljs.pprint :refer [pprint]])))
 
 ;;; Code emission
-(def DEBUG "DEBUG")
-
 
 #?(:clj (defn get-environment-variable
           "Gets the environment variable `name`, optionally returning `default`
@@ -14,16 +12,122 @@
           [name & {:keys [default]}]
           (or (System/getenv name) default)))
 
-#?(:clj (defn is-debug?
-          []
-          (some? (get-environment-variable DEBUG))))
 
+(defmacro is-set?
+  "Evaluates to true if `env-var` is set."
+  [env-var]
+  (when-not (string? env-var)
+    (throw (ex-info "env-var must be an actual string." nil)))
+  (some? (get-environment-variable env-var)))
+
+
+(defmacro is-dev?
+  "Evaluates to `true` if DEV is set."
+  []
+  `(is-set? "DEV"))
+
+
+
+(defmacro emit-case-sensitive
+  "Emits code depending on the value of an environment variable.
+
+  The syntax is similar to a case statement, except it defaults to
+  `nil`.
+
+  By default, the matching is *case-sensitive*. `emit-case` is
+  analogous to `emit-case-sensitive`, but matches regardless of case.
+
+  Note, the name of the env-var and all matches must be strings (and
+  not things that evaluate to strings).
+
+  Example:
+
+      (emit-case-sensitive \"ENV_VAR\"
+          \"BEEP\" (println \"ENV_VAR=BEEP\")
+          \"BOOP\" (println \"ENV_VAR=BOOP\")
+          (println \"ENV_VAR is some other value\"))"
+  [env-var & cases]
+  (when-not (string? env-var)
+    (throw (ex-info "The environment variable name must be a string" nil)))
+  (let [env-val (get-environment-variable env-var)
+        cases (partition-all 2 cases)]
+    (doseq [case cases]
+      (when (and (= 2 (count case))
+                 (-> case first string? not))
+        (throw (ex-info "The case match must be a string" nil))))
+    (when-some [env-val env-val]
+      (reduce (fn [res [match expr :as case]]
+                (cond
+                  (= 1 (count case)) (reduced match)
+                  (= env-val match) (reduced expr)
+                  :else nil))
+              nil
+              cases))))
+
+
+(defmacro emit-case
+  "Emits code depending on the value of an environment variable.
+
+  The syntax is similar to a case statement, except it defaults to
+  `nil`.
+
+  The matching is case-insensitive. `emit-case-sensitive`
+  is analogous to `emit-case`, but is case sensitive.
+
+  Note, the name of the env-var and all matches must be strings (and
+  not things that evaluate to strings).
+
+  Example:
+
+      (emit-case \"ENV_VAR\"
+          \"BEEP\" (println \"ENV_VAR=BEEP\")
+          \"BOOP\" (println \"ENV_VAR=BOOP\")
+          (println \"ENV_VAR is some other value\"))"
+  [env-var & cases]
+  (when-not (string? env-var)
+    (throw (ex-info "The environment variable name must be a string" nil)))
+  (let [env-val (when-some [env-val (get-environment-variable env-var)] (lower-case env-val))
+        cases (partition-all 2 cases)]
+    (doseq [case cases]
+      (when (and (= 2 (count case))
+                 (-> case first string? not))
+        (throw (ex-info "The case match must be a string" nil))))
+    (when-some [env-val env-val]
+      (reduce (fn [res [match expr :as case]]
+                (cond
+                  (= 1 (count case)) (reduced match)
+                  (= env-val (lower-case match)) (reduced expr)
+                  :else nil))
+              nil
+              cases))))
+
+
+(defmacro emit-if
+  "Emits `then` if `env-var` is set to anything, otheriwise `then`."
+  [env-var then else]
+  (if (some? (get-environment-variable env-var))
+    then
+    else))
+
+
+(defmacro emit-when
+  "Emits the expressions in a do block followed by nil when the `env-var` is set."
+  [env-var & exprs]
+  (when (some? (get-environment-variable env-var))
+    `(do ~@exprs nil)))
+
+
+(defmacro emit-when-not
+  "Emits the expressions in a do block followed by nil when the `env-var` is not set."
+  [env-var & exprs]
+  (when (nil? (get-environment-variable env-var))
+    `(do ~@exprs nil)))
 
 
 (defmacro dev
-  "Emits the expressions followed by `nil` in a `do` block when the DEBUG environment variable is set, otherwise removes them."
+  "Emits the expressions followed by `nil` in a `do` block when the DEV environment variable is set, otherwise removes them."
   [& exprs]
-  (when (is-debug?) `(do ~@exprs nil)))
+  `(emit-when "DEV" ~@exprs))
 
 
 
