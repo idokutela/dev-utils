@@ -20,7 +20,7 @@ Just add this line to `:deps` in your `deps.edn`:
 
 ```cljs
 github-idokutela/to-go {:git/url "https://github.com/idokutela/dev-utils"
-                        :sha     "17dc775ca66a242b87ec0ffc0061f03bebe24f3d"}
+                        :sha     "2681f431254f36df3a690f246bbe5148ad59babb"}
 ```
 
 then follow the example.
