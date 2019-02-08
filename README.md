@@ -97,23 +97,9 @@ then follow the example.
 (get-environment-variable "FOO") ; The value the FOO environment variable is set to.
 ```
 
-
 ## API
 
-A number of macros are devined:
-
- - `emit-if <env-var> <then> <else>`
-
- - `dev & <exprs>`: places the expressions followed by `nil`in a `do`
-   block if the `DEBUG` variable is set, otherwise replaces with
-   `nil`.
-
- - `log <level> & <message>`: Logs a message. Evaluates to nil.  The
-   code is only emitted if the `LOG_LEVEL` is less than or equal to
-   the given level.
-
-
-
+See the clojure docs.
 
 ## License
 MIT
